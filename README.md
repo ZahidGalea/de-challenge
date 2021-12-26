@@ -43,3 +43,6 @@ We use the data from TopGames provided by Metascore.
 * [Kaggle: Metacritic reviewed games since 2000](https://www.kaggle.com/destring/metacritic-reviewed-games-since-2000)
 
 
+## Solution of this Challenge.
+
+* [File with the description](SOLUTION.md)
