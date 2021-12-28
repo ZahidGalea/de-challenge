@@ -11,7 +11,7 @@ name: "Terraform"
         required: true
 
 jobs:
-  terraform-test:
+  terraform-plan-test:
     if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
     runs-on: ubuntu-latest
     environment: test
@@ -42,6 +42,7 @@ jobs:
         working-directory: ${{ env.working-directory }}
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+          TF_LOG: TRACE
 
       - name: Terraform validate
         id: validate
@@ -56,18 +57,19 @@ jobs:
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
 
-      - name: Terraform apply
-        id: apply
-        run: terraform apply -auto-approve -input=false
-        working-directory: ${{ env.working-directory }}
-        env:
-          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+#      - name: Terraform apply
+#        id: apply
+#        run: terraform apply -auto-approve -input=false
+#        working-directory: ${{ env.working-directory }}
+#        env:
+#          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
 
 
-  terraform:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+  terraform-plan-prod:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
     runs-on: ubuntu-latest
     environment: prod
+
     env:
       working-directory: infraestructure/terraform/de-challenge
     steps:
@@ -89,6 +91,10 @@ jobs:
         run: terraform fmt -check
         continue-on-error: true
 
+      - name: Echo files
+        run: ls
+        working-directory: ${{ env.working-directory }}
+
       - name: Terraform init
         id: init
         run: terraform init
@@ -103,7 +109,7 @@ jobs:
         run: terraform plan -no-color
         working-directory: ${{ env.working-directory }}
 
-      - name: Terraform apply
-        id: apply
-        run: terraform apply -auto-approve -input=false
-        working-directory: ${{ env.working-directory }}
+#      - name: Terraform apply
+#        id: apply
+#        run: terraform apply -auto-approve -input=false
+#        working-directory: ${{ env.working-directory }}
