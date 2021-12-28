@@ -30,7 +30,7 @@ with a resume of the problems and why would I choose it.
 
 The following was the chosen one:
 
-![alt text](img/architecture.jpeg)
+![alt text](img/architecture.png)
 
 This architecture works as event driven, the ETL Job is executed in the exact moment that a file arrives
 into the system, but it has some problems like:
