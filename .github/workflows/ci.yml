@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: test
     env:
-      working-directory: infraestructure/terraform/de-challengue-test
+      working-directory: infraestructure/terraform/de-challengue
     steps:
       - id: 'auth'
         name: 'Authenticate to Google Cloud'
@@ -89,7 +89,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: prod
     env:
-      working-directory: infraestructure/terraform/de-challengue-test
+      working-directory: infraestructure/terraform/de-challenge-test
     steps:
       - id: 'auth'
         name: 'Authenticate to Google Cloud'
