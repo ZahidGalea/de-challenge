@@ -7,6 +7,11 @@ name: "Terraform"
       - main
   push:
     branches: [ main ]
+  workflow_call:
+    secrets:
+      GOOGLE_APPLICATION_CREDENTIALS:
+        description: 'GCP CI/CD Service Account'
+        required: true
 
 jobs:
   terraform-test:
