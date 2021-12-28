@@ -13,6 +13,7 @@ name: "Terraform"
 jobs:
   terraform-test:
     runs-on: ubuntu-latest
+    environment: test
     env:
       working-directory: infraestructure/terraform/de-challengue-test
     steps:
@@ -86,6 +87,7 @@ jobs:
 
   terraform:
     runs-on: ubuntu-latest
+    environment: prod
     env:
       working-directory: infraestructure/terraform/de-challengue-test
     steps:
