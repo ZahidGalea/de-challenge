@@ -15,13 +15,12 @@ jobs:
     runs-on: ubuntu-latest
     env:
       working-directory: infraestructure/terraform/de-challengue-test
-      TF_WORKSPACE: my-workspace
     steps:
       - id: 'auth'
         name: 'Authenticate to Google Cloud'
         uses: 'google-github-actions/auth@v0'
         with:
-          credentials_json: '${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}'
+          credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
 
       - name: Check out code
         uses: actions/checkout@v2
@@ -52,7 +51,7 @@ jobs:
       - name: Plan output
         id: output
         uses: actions/github-script@v3
-        if: github.event_name == 'pull_request'
+        if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
         env:
           PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
         with:
@@ -77,6 +76,7 @@ jobs:
               repo: context.repo.repo,
               body: output
             })
+
       - name: Terraform apply
         id: apply
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
