@@ -1,0 +1,73 @@
+---
+name: "Terraform Apply"
+
+"on":
+  push:
+    branches:
+      - main
+  workflow_call:
+    secrets:
+      GOOGLE_APPLICATION_CREDENTIALS:
+        description: 'GCP CI/CD Service Account'
+        required: true
+  workflow_dispatch:
+
+jobs:
+  terraform-apply-test:
+    runs-on: ubuntu-latest
+    environment: test
+    defaults:
+      run:
+        working-directory: infraestructure/terraform/de-challenge-test
+    steps:
+      - uses: actions/checkout@v2
+      - uses: hashicorp/setup-terraform@v1
+      - id: 'auth'
+        name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@v0'
+        with:
+          credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+
+      - name: Terraform fmt
+        id: fmt
+        run: terraform fmt -check
+        continue-on-error: true
+
+      - name: Terraform Init
+        id: init
+        run: terraform init
+
+      - name: Terraform Apply
+        id: apply
+        run: terraform apply
+
+
+
+  terraform-apply-prod:
+    runs-on: ubuntu-latest
+    environment: prod
+    defaults:
+      run:
+        working-directory: infraestructure/terraform/de-challenge
+    steps:
+      - uses: actions/checkout@v2
+      - uses: hashicorp/setup-terraform@v1
+      - id: 'auth'
+        name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@v0'
+        with:
+          credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+
+      - name: Terraform fmt
+        id: fmt
+        run: terraform fmt -check
+        continue-on-error: true
+
+      - name: Terraform Init
+        id: init
+        run: terraform init
+
+      - name: Terraform Apply
+        id: apply
+        run: terraform apply
+
