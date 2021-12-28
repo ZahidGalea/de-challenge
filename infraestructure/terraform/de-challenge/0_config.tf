@@ -1,5 +1,5 @@
 locals {
-  project_id = "de-challenge"
+  project_id = "de-challenge-336404"
   project_number = 710981158804
   default_region = "us-central1"
   defaul_zone = "us-central1-a"
