@@ -2,8 +2,6 @@
 name: "Terraform"
 
 "on":
-  push:
-    branches: [ main, develop ]
   workflow_call:
     secrets:
       GOOGLE_APPLICATION_CREDENTIALS:
@@ -12,115 +10,64 @@ name: "Terraform"
 
 jobs:
   terraform-plan-test:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
     runs-on: ubuntu-latest
     environment: test
-    env:
-      working-directory: infraestructure/terraform/de-challengue-test
+    defaults:
+      run:
+        working-directory: infraestructure/terraform/de-challengue-test
     steps:
+      - uses: actions/checkout@v2
+      - uses: hashicorp/setup-terraform@v1
       - id: 'auth'
         name: 'Authenticate to Google Cloud'
         uses: 'google-github-actions/auth@v0'
         with:
           credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
 
-      - name: Check out code
-        uses: actions/checkout@v2
-
-      - uses: hashicorp/setup-terraform@v1
-
-      - name: Terraform Fmt
+      - name: Terraform fmt
         id: fmt
         run: terraform fmt -check
         continue-on-error: true
 
-      - name: Echo files
-        run: ls
-        working-directory: ${{ env.working-directory }}
-
-      - name: Terraform init
+      - name: Terraform Init
         id: init
         run: terraform init
-        working-directory: ${{ env.working-directory }}
-        env:
-          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
-          TF_LOG: TRACE
 
-      - name: Terraform validate
+      - name: Terraform Validate
         id: validate
-        run: terraform validate
-        env:
-          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+        run: terraform validate -no-color
 
-      - name: Terraform plan
+      - name: Terraform Plan
         id: plan
-        run: terraform plan
-        working-directory: ${{ env.working-directory }}
-        env:
-          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
-
-#      - name: Terraform apply
-#        id: apply
-#        run: terraform apply -auto-approve -input=false
-#        working-directory: ${{ env.working-directory }}
-#        env:
-#          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
-
-
-  terraform-plan-prod:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
-    runs-on: ubuntu-latest
-    environment: prod
-    env:
-      working-directory: infraestructure/terraform/de-challengue
-    steps:
-      - id: 'auth'
-        name: 'Authenticate to Google Cloud'
-        uses: 'google-github-actions/auth@v0'
-        with:
-          credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
-
-      - name: Check out code
-        uses: actions/checkout@v2
-
-      - uses: hashicorp/setup-terraform@v1
-        with:
-          terraform_version: 1.1.2
-
-      - name: Terraform Fmt
-        id: fmt
-        run: terraform fmt -check
+        run: terraform plan -no-color
         continue-on-error: true
-        working-directory: ${{ env.working-directory }}
 
-      - name: Echo files
-        run: ls
-        working-directory: ${{ env.working-directory }}
-
-      - name: Terraform init
-        id: init
-        run: terraform init
-        working-directory: ${{ env.working-directory }}
+      - uses: actions/github-script@0.9.0
+        if: github.event_name == 'pull_request'
         env:
-          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
-          TF_LOG: TRACE
+          PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
+            #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
+            #### Terraform Validation 🤖\`${{ steps.validate.outputs.stdout }}\`
+            #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
 
-      - name: Terraform validate
-        id: validate
-        run: terraform validate
-        env:
-          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+            <details><summary>Show Plan</summary>
 
-      - name: Terraform plan
-        id: plan
-        run: terraform plan
-        working-directory: ${{ env.working-directory }}
-        env:
-          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+            \`\`\`\n
+            ${process.env.PLAN}
+            \`\`\`
 
-#      - name: Terraform apply
-#        id: apply
-#        run: terraform apply -auto-approve -input=false
-#        working-directory: ${{ env.working-directory }}
-#        env:
-#          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+            </details>
+
+            *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Working Directory: \`${{ env.tf_actions_working_dir }}\`, Workflow: \`${{ github.workflow }}\`*`;
+
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            })
+
