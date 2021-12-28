@@ -1,5 +1,5 @@
 resource "google_project_service" "project" {
-  for_each = local.apis
+  for_each = toset(local.apis)
   project  = local.project_id
   service  = each.value
 
