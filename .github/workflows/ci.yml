@@ -38,7 +38,7 @@ jobs:
 
       - name: Terraform init
         id: init
-        run: terraform init -reconfigure
+        run: terraform init
         working-directory: ${{ env.working-directory }}
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
