@@ -47,7 +47,7 @@ module "analytics_dataset_data_viewer" {
 
 
 locals {
-  analytics-datasets          = ["staging", "consumption"]
+  analytics-datasets          = toset(["staging", "consumption"])
   metascore-bq-owners-access  = [for owner in local.owner_users : "user:${owner}"]
   metascore-bq-viewers-access = [for viewer in local.viewer_users : "user:${viewer}"]
   metascore-bq-editor-access  = [for editor in local.editor_users : "user:${editor}"]
