@@ -12,10 +12,11 @@ name: "Terraform"
 
 jobs:
   terraform-test:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
     runs-on: ubuntu-latest
     environment: test
     env:
-      working-directory: infraestructure/terraform/de-challengue
+      working-directory: infraestructure/terraform/de-challengue-test
     steps:
       - id: 'auth'
         name: 'Authenticate to Google Cloud'
@@ -37,7 +38,7 @@ jobs:
 
       - name: Terraform init
         id: init
-        run: terraform init
+        run: terraform init -reconfigure
         working-directory: ${{ env.working-directory }}
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
@@ -57,7 +58,6 @@ jobs:
 
       - name: Terraform apply
         id: apply
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: terraform apply -auto-approve -input=false
         working-directory: ${{ env.working-directory }}
         env:
@@ -65,10 +65,11 @@ jobs:
 
 
   terraform:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment: prod
     env:
-      working-directory: infraestructure/terraform/de-challenge-test
+      working-directory: infraestructure/terraform/de-challenge
     steps:
       - id: 'auth'
         name: 'Authenticate to Google Cloud'
@@ -102,37 +103,7 @@ jobs:
         run: terraform plan -no-color
         working-directory: ${{ env.working-directory }}
 
-      - name: Plan output
-        id: output
-        uses: actions/github-script@v3
-        if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
-        env:
-          PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
-            ### Workspace
-            \`${process.env.TF_WORKSPACE}\`
-            #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
-            #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
-            <details><summary>Show Plan</summary>
-            \`\`\`hcl
-            ${process.env.PLAN}
-            \`\`\`
-            </details>
-            **Pusher**: @${{ github.actor }}
-            **Action**: ${{ github.event_name }}
-            `;
-            github.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: output
-            })
-
       - name: Terraform apply
         id: apply
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: terraform apply -auto-approve -input=false
         working-directory: ${{ env.working-directory }}
