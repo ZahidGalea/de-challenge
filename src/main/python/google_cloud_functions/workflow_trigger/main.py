@@ -1,0 +1,95 @@
+import base64
+import json
+import os
+import re
+
+from google.cloud.workflows.executions_v1beta.services.executions import async_client
+from google.cloud.workflows.executions_v1beta.types import executions
+
+import configparser
+
+gcf_syspath = os.path.dirname(__file__)
+
+
+def build_file_identifier(file_name):
+    return ''.join(filter(str.isalpha, file_name.split(".")[0]))
+
+
+def get_config_that_matches(string, workflows_dict: dict):
+    default_section = None
+    for workflow, section in workflows_dict.items():
+        if workflow == "DEFAULT":
+            default_section = section
+            continue
+        if re.search(pattern=section["pattern"], string=string):
+            return section
+    return default_section
+
+
+def main(event, context):
+    """Background Cloud Function to be triggered by Pub/Sub.
+    Args:
+         event (dict):  The dictionary with data specific to this type of
+         event. The `data` field contains the PubsubMessage message. The
+         `attributes` field will contain custom attributes if there are any.
+         context (google.cloud.functions.Context): The Cloud Functions event
+         metadata. The `event_id` field contains the Pub/Sub message ID. The
+         `timestamp` field contains the publish time.
+    """
+
+    runcontext_gcp_project_id = os.environ.get("GCP_PROJECT")
+    runcontext_gcp_region = os.environ.get("FUNCTION_REGION")
+
+    config = configparser.RawConfigParser()
+    config.read(f'{gcf_syspath}/workflows.ini')
+    workflows_dict = dict(config)
+
+    # # Opens workflows.properties
+    # with open(f'{gcf_syspath}/workflows.properties', 'r+') as patterns:
+    #     workflows_dict = json.loads(patterns.read())
+
+    # First variable definitions
+    data = base64.b64decode(event['data']).decode('utf-8')
+    data_dict = json.loads(data)
+    file_bucket = data_dict["bucket"]
+    file_path = data_dict["name"]
+    file_name = file_path.split("/")[-1]
+
+    file_config = get_config_that_matches(string=file_name,
+                                          workflows_dict=workflows_dict)
+
+    if file_config.name == "DEFAULT":
+        raw_prefix = file_config["raw_prefix"]
+        # TODO: Añadir movimiento a bucket raw en carpeta sin información
+        pass
+
+    # re.search(pattern="", string=file_name):
+    print('Matches')
+
+    ############## ARGUMENTS PREPARATION ##########################
+    landing_bucket =
+    raw_bucket =
+    raw_prefix =
+    dataflow_template =
+    analytics_bucket =
+    analytics_dataset =
+
+
+
+    ############## WORKFLOW EXECUTION    ##########################
+    # Init the client
+    workflow_client = async_client.ExecutionsClient()
+    parent_path = "projects/{project}/locations/{location}/workflows/{workflow}"
+
+    print('Generating Execution...')
+    # Generates a definition with the arguments as parameters
+    execution = executions.Execution()
+    # Executes it
+    print('Creating Execution')
+    workflow_client.create_execution(parent=parent_path.format(project=runcontext_gcp_project_id,
+                                                               location=runcontext_gcp_region,
+                                                               workflow=file_config["workflow_to_trigger"]),
+                                     execution=execution)
+
+    print('Workflow execution ended')
+    return True
