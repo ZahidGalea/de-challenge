@@ -15,7 +15,7 @@ jobs:
     environment: test
     defaults:
       run:
-        working-directory: infraestructure/terraform/de-challengue-test
+        working-directory: infraestructure/terraform/de-challenge-test
     steps:
       - uses: actions/checkout@v2
       - uses: hashicorp/setup-terraform@v1
