@@ -13,9 +13,11 @@ jobs:
   terraform-plan-test:
     runs-on: ubuntu-latest
     environment: test
+    env:
+      WORKDIR: infraestructure/terraform/de-challenge-test
     defaults:
       run:
-        working-directory: infraestructure/terraform/de-challenge-test
+        working-directory: ${{ env.WORKDIR }}
     steps:
       - uses: actions/checkout@v2
       - uses: hashicorp/setup-terraform@v1
@@ -62,7 +64,7 @@ jobs:
 
             </details>
 
-            *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Working Directory: \`${{ env.working-directory }}\`, Workflow: \`${{ github.workflow }}\`*`;
+            *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Working Directory: \`${{ env.WORKDIR }}\`, Workflow: \`${{ github.workflow }}\`*`;
 
             github.issues.createComment({
               issue_number: context.issue.number,
@@ -76,9 +78,11 @@ jobs:
   terraform-plan-prod:
     runs-on: ubuntu-latest
     environment: prod
+    env:
+      WORKDIR: infraestructure/terraform/de-challenge
     defaults:
       run:
-        working-directory: infraestructure/terraform/de-challenge
+        working-directory: ${{ env.WORKDIR }}
     steps:
       - uses: actions/checkout@v2
       - uses: hashicorp/setup-terraform@v1
@@ -125,7 +129,7 @@ jobs:
 
             </details>
 
-            *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Working Directory: \`${{ env.working-directory }}\`, Workflow: \`${{ github.workflow }}\`*`;
+            *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Working Directory: \`${{ env.WORKDIR }}\`, Workflow: \`${{ github.workflow }}\`*`;
 
             github.issues.createComment({
               issue_number: context.issue.number,
