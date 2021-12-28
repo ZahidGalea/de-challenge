@@ -9,21 +9,21 @@ module "landing-bucket-metascore" {
 }
 
 locals {
-  metascore-ldn : metascore-lnd
-  metascore-raw : metascore-raw
-  metascore-owners-access : [
+  metascore-ldn = metascore-lnd
+  metascore-raw = metascore-raw
+  metascore-owners-access = [
   for owner in local.owner_users : {
     role   = "roles/storage.objectAdmin",
     member = "user:${owner}"
   }
   ]
-  metascore-editor-access : [
+  metascore-editor-access = [
   for editor in local.editor_users : {
     role   = "roles/storage.objectAdmin",
     member = "user:${editor}"
   }
   ]
-  metascore-viewer-access : [
+  metascore-viewer-access = [
   for viewer in local.viewer_users : {
     role   = "roles/storage.objectViewer",
     member = "user:${viewer}"
