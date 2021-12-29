@@ -59,7 +59,6 @@ def step_impl(context, modelo, infraestructure_config_file, logger):
 
 @then(parsers.parse("se valida la existencia de los {lista_patterns} en el bucket de analytics"))
 def step_impl(context, lista_patterns, infraestructure_config_file, logger):
-    datetime_now = datetime.date(datetime.now()).strftime("%Y%m%d")
     lista_patterns = ast.literal_eval(lista_patterns)
     for pattern in lista_patterns:
         assert resources_handler.blob_pattern_exists(
