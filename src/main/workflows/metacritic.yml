@@ -20,15 +20,16 @@ main:
         args:
           projectId: ${sys.get_env("GOOGLE_CLOUD_PROJECT_ID")}
           location: "us-central1"
-          launchParameter:
-            containerSpecGcsPath: ${"gs://"+ workflow_parameters_object.artifacts_bucket + "/dataflow_templates/" + workflow_parameters_object.dataflow_template}
-            environment:
-              additionalExperiments: [ "enable_prime" ]
-              #tempLocation: ...
-            jobName: ${"metacritics-"+ workflow_parameters_object.source_file}
-            parameters:
-              input_file: ${"gs://" + copyResult.bucket + "/" + copyResult.name}
-              analytics_bucket: ${workflow_parameters_object.analytics_bucket}
-              staging_dataset: ${workflow_parameters_object.staging_dataset}
-            update: true
+          body:
+            launchParameter:
+              containerSpecGcsPath: ${"gs://"+ workflow_parameters_object.artifacts_bucket + "/dataflow_templates/" + workflow_parameters_object.dataflow_template}
+              environment:
+                additionalExperiments: [ "enable_prime" ]
+                #tempLocation: ...
+              jobName: ${"metacritics-"+ workflow_parameters_object.source_file}
+              parameters:
+                input_file: ${"gs://" + copyResult.bucket + "/" + copyResult.name}
+                analytics_bucket: ${workflow_parameters_object.analytics_bucket}
+                staging_dataset: ${workflow_parameters_object.staging_dataset}
+              update: true
         result: launchResult
