@@ -16,7 +16,7 @@ main:
           object: ${workflow_parameters_object.source_file}
         result: deleteResult
     - executes_dataflow_job:
-        call: googleapis.dataflow.v1b3.projects.templates.launch
+        call: googleapis.dataflow.v1b3.projects.locations.flexTemplates.launch
         args:
           projectId: ${sys.get_env("GOOGLE_CLOUD_PROJECT_ID")}
           containerSpecGcsPath: ${"gs://"+ workflow_parameters_object.artifacts_bucket + "/dataflow_templates/" + workflow_parameters_object.dataflow_template}
