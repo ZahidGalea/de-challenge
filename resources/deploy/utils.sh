@@ -42,10 +42,8 @@ gcloud_pubsub_function_deploy() {
 gcloud_workflows_deploy() {
   export workflow_name="$1"
   export source="$2"
-  export project="$3"
 
   gcloud workflows deploy $workflow_name \
-    --source=$source \
-    --project $project
+    --source=$source
 
 }

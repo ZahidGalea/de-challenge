@@ -1,0 +1,39 @@
+---
+name: "Code & Artifacts deployment"
+
+"on":
+  pull_request:
+  workflow_call:
+    secrets:
+      GOOGLE_APPLICATION_CREDENTIALS:
+        description: 'GCP CI/CD Service Account'
+        required: true
+
+jobs:
+  workflows-deployment-test:
+    runs-on: ubuntu-latest
+    environment: test
+    strategy:
+      matrix:
+        workflow_files: [ src/main/workflows/consoles_dim.yml,
+                          src/main/workflows/metacritic.yml,
+                          src/main/workflows/undefined_files.yml ]
+    steps:
+      - uses: actions/checkout@v2
+      - id: 'auth'
+        name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@v0'
+        with:
+          credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v0
+      - name: 'Check gcloud CLI'
+        run: 'gcloud info'
+      - name: 'Utils in context'
+        run:  . resources/deploy/utils.sh
+      - name: 'Deploy of consoles_dim'
+        run: gcloud_workflows_deploy consoles_dim src/main/workflows/consoles_dim.yml
+      - name: 'Deploy of metacritic'
+        run: gcloud_workflows_deploy metacritic src/main/workflows/metacritic.yml
+      - name: 'Deploy of undefined_files'
+        run: gcloud_workflows_deploy undefined_files src/main/workflows/undefined_files.yml
