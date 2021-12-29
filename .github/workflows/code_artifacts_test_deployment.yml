@@ -95,6 +95,7 @@ jobs:
           TEMPLATE_IMAGE: gcr.io/${{ env.GCP_PROJECT_ID }}/dataflow/result_csv:latest
 
   integration-test:
+    needs: [ workflows-deployment, workflows-trigger-gcf-deployment, dataflow-flex-tmpl-deployment ]
     runs-on: ubuntu-latest
     environment: test
     steps:
