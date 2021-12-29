@@ -4,15 +4,21 @@
   "parameters": [
     {
       "name": "input_file",
-      "label": "Input Cloud Storage file(s)"
+      "label": "Input Cloud Storage file(s)",
+      "helpText": "Input Cloud Storage file(s)",
+      "isOptional": false
     },
     {
       "name": "analytics_bucket",
-      "label": "RAW Bucket for outputs"
+      "label": "RAW Bucket for outputs",
+      "helpText": "RAW Bucket for outputs",
+      "isOptional": false
     },
     {
       "name": "staging_dataset",
-      "label": "Staging Bigquery dataset"
+      "label": "Staging Bigquery dataset",
+      "helpText": "RAW Bucket for outputs",
+      "isOptional": false
     }
   ]
 }
