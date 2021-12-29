@@ -82,7 +82,7 @@ jobs:
         run: 'gcloud info'
 
       - name: 'Deploy of Dataflow Template to Container Registry'
-        run: gcloud builds submit --tag "${{ env.TEMPLATE_IMAGE }}" .
+        run: gcloud builds submit --tag "${{ env.TEMPLATE_IMAGE }}" src/main/python/dataflow/result_csv/
         env:
           TEMPLATE_IMAGE: gcr.io/${{ env.GCP_PROJECT_ID }}/dataflow/result_csv:latest
 
