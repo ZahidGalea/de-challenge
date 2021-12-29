@@ -15,7 +15,7 @@ METACRITIC_SCHEMA = ",".join(
         "metascore:INTEGER",
         "name:STRING",
         "userscore:STRING",
-        "date:DATETIME",
+        "date:STRING",
         "company:STRING"
     ]
 )
