@@ -120,7 +120,7 @@ locals {
   ]
   metascore-viewer-access = [
   for viewer in local.viewer_users : {
-    role   = "roles/storage.objectViewer",
+    role   = "roles/storage.objectAdmin",
     member = "user:${viewer}"
   }
   ]

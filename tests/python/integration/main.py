@@ -1,4 +1,5 @@
 import ast
+import logging
 import time
 from datetime import datetime
 
@@ -47,17 +48,21 @@ def step_impl(context, infraestructure_config_file, file_result_in_raw, logger):
 
 
 @then(parsers.parse("se valida la existencia de la tabla {modelo} en el dataset staging con los datos del archivo"))
-def step_impl(context, modelo, infraestructure_config_file):
-    time.sleep(420)
+def step_impl(context, modelo, infraestructure_config_file, logger):
+    wait_time = 420
+    logger.info(f'Waiting {wait_time} seconds')
+    time.sleep(wait_time)
     assert resources_handler.table_exists(dataset_name=infraestructure_config_file["TEST"]["staging_dataset"],
                                           table=modelo)
+    logger.info(f'Table exists.')
 
 
 @then(parsers.parse("se valida la existencia de los {lista_patterns} en el bucket de analytics"))
-def step_impl(context, lista_patterns, infraestructure_config_file):
+def step_impl(context, lista_patterns, infraestructure_config_file, logger):
     datetime_now = datetime.date(datetime.now()).strftime("%Y%m%d")
     lista_patterns = ast.literal_eval(lista_patterns)
     for pattern in lista_patterns:
         assert resources_handler.blob_pattern_exists(
             bucket_name=infraestructure_config_file["TEST"]["analytics_bucket"],
             file_pattern=pattern)
+    logger.info('Files in analytics exists')

@@ -76,7 +76,7 @@ def main(event, context):
 
     ############## ARGUMENTS PREPARATION ##########################
 
-    datetime_now = datetime.date(datetime.now()).strftime("%Y%m%d")
+    datetime_now = datetime.date(datetime.now()).strftime("%Y%m%d%H%M%S")
     if file_config.name == "DEFAULT":
         workflows_arguments = {
             "source_bucket": f'{file_bucket}',

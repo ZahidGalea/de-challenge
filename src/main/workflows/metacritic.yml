@@ -26,7 +26,7 @@ main:
               environment:
                 additionalExperiments: [ "enable_prime" ]
                 tempLocation: ${workflow_parameters_object.temporary_bucket}
-              jobName: metacritics
+              jobName: ${ "metacritics-"+ workflow_parameters_object.execution_date}
               parameters:
                 input_file: ${"gs://" + copyResult.bucket + "/" + copyResult.name}
                 analytics_bucket: ${workflow_parameters_object.analytics_bucket}

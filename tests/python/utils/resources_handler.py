@@ -1,3 +1,4 @@
+import re
 from logging import getLogger
 import os
 
@@ -62,7 +63,10 @@ def blob_pattern_exists(bucket_name, file_pattern):
     from google.cloud import storage
     storage_client = storage.Client()
     bucket = storage_client.bucket(bucket_name)
-    return storage.Blob(bucket=bucket, name=file_name).exists()
+    for blob in storage_client.list_blobs(bucket):
+        if re.search(file_pattern, blob.name):
+            return True
+    return False
 
 
 def workflow_exists(workflow_parent_path, workflow_to_check_name):

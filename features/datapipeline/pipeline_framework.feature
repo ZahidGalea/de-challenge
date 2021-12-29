@@ -11,7 +11,7 @@ Feature: Movimiento de un archivo landing a bigquery y gcs
     And el template dataflow_templates/result_csv.json en un bucket de artefactos
     And el archivo tests/resources/data/result.csv en un bucket landing con el nombre result.csv
     Then se valida el archivo consolidado en raw con el nombre result/result.csv
-    Then se valida la existencia de los ["top_10_games_*.csv*","top_10_games_by_console_*.csv-*","worst_10_games_*.csv-*","worst_10_games_by_console_*.csv-*"] en el bucket de analytics
+    Then se valida la existencia de los ["top_10_games_.*csv.*","top_10_games_by_console_.*csv-.*","worst_10_games_.*csv-.*","worst_10_games_by_console_.*csv-.*"] en el bucket de analytics
     Then se valida la existencia de la tabla metacritic_model en el dataset staging con los datos del archivo
 
 
