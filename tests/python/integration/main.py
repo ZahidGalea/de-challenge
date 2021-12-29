@@ -1,7 +1,7 @@
 import time
 
 from pytest_bdd import scenario, given, then, parsers
-from tests.python.utils.resources_handler import workflow_exists, blob_exists, gcs_storage_upload_blob
+from tests.python.utils.resources_handler import workflow_exists, blob_exists, gcs_storage_upload_blob, table_exists
 
 
 @scenario('datapipeline/pipeline_framework.feature',
@@ -44,9 +44,10 @@ def step_impl(context, infraestructure_config_file, file_result_in_raw, logger):
     logger.info('It exists.')
 
 
-@then(parsers.parse("se valida la existencia de la tabla {modelo} en el dataset {dataset} con los datos del archivo"))
-def step_impl(context, modelo, dataset):
-    NotImplementedError('Not implemented')
+@then(parsers.parse("se valida la existencia de la tabla {modelo} en el dataset staging con los datos del archivo"))
+def step_impl(context, modelo, infraestructure_config_file):
+    assert table_exists(dataset_name=infraestructure_config_file["TEST"]["staging_dataset"],
+                        table=modelo)
 
 
 @then(parsers.parse("se valida la existencia de los {lista_archivos} en el bucket de analytics"))

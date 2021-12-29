@@ -42,6 +42,15 @@ def clean_all_tables_in_dataset(dataset_name):
         return e
 
 
+def table_exists(dataset_name, table):
+    from google.cloud.bigquery.client import Client
+    gcp_bigquery_client = Client()
+    for table_ref in gcp_bigquery_client.list_tables(dataset_name):
+        if table_ref.full_table_id.split(".")[-1] == table:
+            return True
+    return False
+
+
 def blob_exists(bucket_name, file_name):
     from google.cloud import storage
     storage_client = storage.Client()

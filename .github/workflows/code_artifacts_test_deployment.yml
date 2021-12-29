@@ -92,7 +92,6 @@ jobs:
             --metadata-file "src/main/python/dataflow/result_csv/metadata.json"
         env:
           TEMPLATE_PATH: gs://${{ env.ARTIFACTS_BUCKET }}/dataflow_templates/result_csv.json
-
           TEMPLATE_IMAGE: gcr.io/${{ env.GCP_PROJECT_ID }}/dataflow/result_csv:latest
 
   integration-test:

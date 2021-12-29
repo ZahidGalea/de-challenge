@@ -12,10 +12,15 @@ name: "Code & Artifacts deployment"
         required: true
   workflow_dispatch:
 
+env:
+  GCP_PROJECT_ID: de-challenge-336404
+  ARTIFACTS_BUCKET: de-challenge-336404-artifacts
+
+
 jobs:
   workflows-deployment:
     runs-on: ubuntu-latest
-    environment: prod
+    environment: test
     steps:
       - uses: actions/checkout@v2
       - id: 'auth'
@@ -33,9 +38,10 @@ jobs:
         run: gcloud workflows deploy metacritic --source=src/main/workflows/metacritic.yml
       - name: 'Deploy of undefined_files'
         run: gcloud workflows deploy undefined_files --source=src/main/workflows/undefined_files.yml
+
   workflows-trigger-gcf-deployment:
     runs-on: ubuntu-latest
-    environment: prod
+    environment: test
     steps:
       - uses: actions/checkout@v2
       - id: 'auth'
@@ -59,5 +65,69 @@ jobs:
             --clear-max-instances \
             --region us-central1 \
             --memory 128MB \
-            --set-env-vars ENVIRONMENT=PROD
+            --set-env-vars ENVIRONMENT=TEST
+
+  dataflow-flex-tmpl-deployment:
+    runs-on: ubuntu-latest
+    environment: test
+    steps:
+      - uses: actions/checkout@v2
+      - id: 'auth'
+        name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@v0'
+        with:
+          credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v0
+
+      - name: 'Check gcloud CLI'
+        run: 'gcloud info'
+
+      - name: 'Deploy of Dataflow Template to Container Registry'
+        run: gcloud builds submit --tag "${{ env.TEMPLATE_IMAGE }}" .
+        env:
+          TEMPLATE_IMAGE: gcr.io/${{ env.GCP_PROJECT_ID }}/dataflow/result_csv:latest
+        working-directory: src/main/python/dataflow/result_csv
+
+      - name: 'Save Dataflow Template to GCS'
+        run: |
+          gcloud dataflow flex-template build ${{ env.TEMPLATE_PATH }} \
+            --image "${{ env.TEMPLATE_IMAGE }}" --sdk-language "PYTHON" \
+            --metadata-file "src/main/python/dataflow/result_csv/metadata.json"
+        env:
+          TEMPLATE_PATH: gs://${{ env.ARTIFACTS_BUCKET }}/dataflow_templates/result_csv.json
+          TEMPLATE_IMAGE: gcr.io/${{ env.GCP_PROJECT_ID }}/dataflow/result_csv:latest
+
+  integration-test:
+    runs-on: ubuntu-latest
+    environment: test
+    steps:
+      - uses: actions/checkout@v2
+      - id: 'auth'
+        name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@v0'
+        with:
+          credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+
+      # Setup Python (faster than using Python container)
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.7"
+
+      - name: Install pipenv
+        run: python -m pip install --upgrade pipenv wheel
+
+      - id: cache-pipenv
+        uses: actions/cache@v1
+        with:
+          path: ~/.local/share/virtualenvs
+          key: ${{ runner.os }}-pipenv-${{ hashFiles('**/Pipfile.lock') }}
+
+      - name: Install dependencies
+        if: steps.cache-pipenv.outputs.cache-hit != 'true'
+        run: pipenv install --deploy --dev
+
+      - name: Run Integration test
+        run: pipenv run pytest tests/python/integration/main.py -v
 
