@@ -1,0 +1,18 @@
+{
+  "description": "Pipeline el cual toma datos de metacritics y genera reportería",
+  "name": "Metacritics Pipeline",
+  "parameters": [
+    {
+      "name": "input_file",
+      "label": "Input Cloud Storage file(s)"
+    },
+    {
+      "name": "analytics_bucket",
+      "label": "RAW Bucket for outputs"
+    },
+    {
+      "name": "staging_dataset",
+      "label": "Staging Bigquery dataset"
+    }
+  ]
+}

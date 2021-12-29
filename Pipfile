@@ -1,0 +1,31 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+
+[dev-packages]
+coverage = "*"
+pytest = "*"
+pytest-cov = "*"
+pytest-bdd = "*"
+google-cloud-resource-manager = "*"
+google-cloud-storage = "*"
+google-cloud-bigquery = "*"
+google-cloud-pubsub = "*"
+jsonschema = "*"
+google-cloud-firestore = "*"
+pyyaml = "*"
+google-cloud-workflows = "*"
+pandas = "*"
+pandas-gbq = "*"
+apache-beam = "*"
+google-api-python-client = "*"
+
+[requires]
+python_version = "3.7"
+
+[scripts]
+integration = "pytest tests/python/integration/"
+uni = "pytest tests/python/unit/"
