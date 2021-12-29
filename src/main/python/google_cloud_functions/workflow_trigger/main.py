@@ -68,23 +68,23 @@ def main(event, context):
     file_config = get_config_that_matches(string=file_name,
                                           workflows_dict=workflows_dict)
 
-    if file_config.name == "DEFAULT":
-        raw_prefix = file_config["raw_prefix"]
-        # TODO: Añadir movimiento a bucket raw en carpeta sin información
-        pass
-
-    # re.search(pattern="", string=file_name):
-    print('Matches')
-
     ############## ARGUMENTS PREPARATION ##########################
-    workflows_arguments = {
-        "landing_bucket": infra_config[runcontext_environment]["landing_bucket"],
-        "raw_bucket": infra_config[runcontext_environment]["raw_bucket"],
-        "raw_prefix": file_config["raw_prefix"],
-        'analytics_bucket': infra_config[runcontext_environment]["analytics_bucket"],
-        "staging_dataset": infra_config[runcontext_environment]["staging_dataset"],
-        "dataflow_template": file_config["dataflow_job"]
-    }
+    if file_config.name == "DEFAULT":
+        workflows_arguments = {
+            "source_bucket": f'{file_bucket}',
+            "source_file": f'{file_name}',
+            "raw_bucket": infra_config[runcontext_environment]["raw_bucket"]
+        }
+    else:
+        workflows_arguments = {
+            "source_bucket": f'{file_bucket}',
+            "source_file": f'{file_name}',
+            "raw_bucket": infra_config[runcontext_environment]["raw_bucket"],
+            "raw_prefix": file_config["raw_prefix"],
+            'analytics_bucket': infra_config[runcontext_environment]["analytics_bucket"],
+            "staging_dataset": infra_config[runcontext_environment]["staging_dataset"],
+            "dataflow_template": file_config["dataflow_job"]
+        }
 
     ############## WORKFLOW EXECUTION    ##########################
     # Init the client
