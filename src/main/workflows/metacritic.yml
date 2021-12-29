@@ -20,7 +20,7 @@ main:
         args:
           projectId: ${sys.get_env("GOOGLE_CLOUD_PROJECT_ID")}
           location: "us-central1"
-          body:
+          launchParameter:
             containerSpecGcsPath: ${"gs://"+ workflow_parameters_object.artifacts_bucket + "/dataflow_templates/" + workflow_parameters_object.dataflow_template}
             environment:
               additionalExperiments: [ "enable_prime" ]
