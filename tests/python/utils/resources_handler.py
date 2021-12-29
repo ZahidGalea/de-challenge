@@ -58,6 +58,13 @@ def blob_exists(bucket_name, file_name):
     return storage.Blob(bucket=bucket, name=file_name).exists()
 
 
+def blob_pattern_exists(bucket_name, file_pattern):
+    from google.cloud import storage
+    storage_client = storage.Client()
+    bucket = storage_client.bucket(bucket_name)
+    return storage.Blob(bucket=bucket, name=file_name).exists()
+
+
 def workflow_exists(workflow_parent_path, workflow_to_check_name):
     from google.cloud.workflows import WorkflowsClient
     # projects/{project}/locations/{location}
