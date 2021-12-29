@@ -65,8 +65,8 @@ if __name__ == "__main__":
     args, beam_args = parser.parse_known_args()
 
     run(
-        input_file=args.input_subscription,
-        analytics_bucket=args.output_table,
-        staging_dataset=args.window_interval_sec,
+        input_file=args.input_file,
+        analytics_bucket=args.analytics_bucket,
+        staging_dataset=args.staging_dataset,
         beam_args=beam_args
     )
