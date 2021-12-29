@@ -3,8 +3,8 @@ import json
 import os
 import re
 
-from google.cloud.workflows.executions_v1beta.services.executions import async_client
-from google.cloud.workflows.executions_v1beta.types import executions
+from google.cloud.workflows.executions_v1.services.executions import async_client
+from google.cloud.workflows.executions_v1.types import executions
 
 import configparser
 
@@ -39,10 +39,20 @@ def main(event, context):
 
     runcontext_gcp_project_id = os.environ.get("GCP_PROJECT")
     runcontext_gcp_region = os.environ.get("FUNCTION_REGION")
+    runcontext_environment = os.environ.get("ENVIRONMENT")
+    if runcontext_environment not in ["PROD", "TEST"]:
+        raise ValueError('The environment variable must be PROD or TEST')
 
-    config = configparser.RawConfigParser()
-    config.read(f'{gcf_syspath}/workflows.ini')
-    workflows_dict = dict(config)
+    workflows_config = configparser.RawConfigParser()
+    workflows_config.read(f'{gcf_syspath}/workflows.ini')
+    workflows_dict = dict(workflows_config)
+
+    infra_config = configparser.RawConfigParser()
+    infra_config.read(f'{gcf_syspath}/infra.ini')
+    infra_dict = dict(infra_config)
+
+    if "PROD" not in infra_dict:
+        raise OSError("Failed to load infraestructure dictionary")
 
     # # Opens workflows.properties
     # with open(f'{gcf_syspath}/workflows.properties', 'r+') as patterns:
@@ -67,14 +77,14 @@ def main(event, context):
     print('Matches')
 
     ############## ARGUMENTS PREPARATION ##########################
-    landing_bucket =
-    raw_bucket =
-    raw_prefix =
-    dataflow_template =
-    analytics_bucket =
-    analytics_dataset =
-
-
+    workflows_arguments = {
+        "landing_bucket": infra_config[runcontext_environment]["landing_bucket"],
+        "raw_bucket": infra_config[runcontext_environment]["raw_bucket"],
+        "raw_prefix": file_config["raw_prefix"],
+        'analytics_bucket': infra_config[runcontext_environment]["analytics_bucket"],
+        "staging_dataset": infra_config[runcontext_environment]["staging_dataset"],
+        "dataflow_template": file_config["dataflow_job"]
+    }
 
     ############## WORKFLOW EXECUTION    ##########################
     # Init the client
@@ -83,7 +93,7 @@ def main(event, context):
 
     print('Generating Execution...')
     # Generates a definition with the arguments as parameters
-    execution = executions.Execution()
+    execution = executions.Execution(argument=json.dumps(obj=workflows_arguments))
     # Executes it
     print('Creating Execution')
     workflow_client.create_execution(parent=parent_path.format(project=runcontext_gcp_project_id,

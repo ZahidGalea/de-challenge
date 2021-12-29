@@ -1,12 +1,12 @@
 import base64
 import pytest
 from unittest import mock
-
+import os
 from src.main.python.google_cloud_functions.workflow_trigger import main as workflow_trigger_main
 from src.test.python.basetest import TestBase
 
 
-class TestIntegration(TestBase):
+class TestWorkflowIntegration(TestBase):
 
     def setUp(self) -> None:
         self.config.pubsub_function_event = None
@@ -25,6 +25,11 @@ class TestIntegration(TestBase):
 
     @pytest.mark.integrationtest
     def test_workflow_trigger(self):
+        import shutil
+        project_folder = os.getcwd()
+        shutil.copyfile(f"{project_folder}/src/resources/infra.ini",
+                        f"{project_folder}/src/main/python/google_cloud_functions/workflow_trigger/infra.ini")
+
         name = '{"bucket":"gs://bucket/test","name":"result.csv"}'
         self.config.pubsub_function_event = {'data': base64.b64encode(name.encode())}
 
