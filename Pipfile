@@ -27,4 +27,5 @@ google-api-python-client = "*"
 python_version = "3.7"
 
 [scripts]
-test = "pytest"
+integration = "pytest tests/python/integration/"
+uni = "pytest tests/python/unit/"
