@@ -33,6 +33,17 @@ module "analytics-bucket-metascore" {
   iam_members = concat(local.metascore-owners-access, local.metascore-editor-access, local.metascore-viewer-access)
 }
 
+module "artifacts-bucket" {
+  source      = "terraform-google-modules/cloud-storage/google//modules/simple_bucket"
+  version     = "~> 1.3"
+  name        = "${local.project_id}-${local.artifacts-bucket}"
+  project_id  = local.project_id
+  location    = local.default_region
+  versioning  = true
+  iam_members = concat(local.metascore-owners-access, local.metascore-editor-access, local.metascore-viewer-access)
+}
+
+
 ################
 # Landing Notification
 ################
@@ -83,6 +94,7 @@ locals {
   ldn-pubsub-topic        = "lnd-notification"
   metascore-raw           = "metascore-raw"
   metascore-analytics     = "metascore-analytics"
+  artifacts-bucket        = "artifacts"
   metascore-owners-access = [
   for owner in local.owner_users : {
     role   = "roles/storage.objectAdmin",

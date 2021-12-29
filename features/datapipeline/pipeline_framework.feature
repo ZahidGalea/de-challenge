@@ -11,8 +11,9 @@ Feature: Movimiento de un archivo landing a bigquery y gcs
     And el template result_csv en un bucket de artefactos
     And el archivo src/test/resources/data/result.csv en un bucket landing
     Then se valida el archivo consolidado en raw con el nombre result.csv
-    Then se valida la existencia de los archivos en el bucket de analytics
-    Then se valida la existencia de la tabla con los datos del archivo
+    Then se valida la existencia de la tabla metacritic_model en el dataset staging con los datos del archivo
+    Then se valida la existencia de los ["top_10.csv"] en el bucket de analytics
+
 
   Scenario: El archivo consoles.csv llega al bucket landing y se ejecuta la ETL
     Given el workflow consoles_dim deployado en GCP

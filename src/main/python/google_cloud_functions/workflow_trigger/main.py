@@ -42,11 +42,17 @@ def main(event, context):
     runcontext_environment = os.environ.get("ENVIRONMENT")
     if runcontext_environment not in ["PROD", "TEST"]:
         raise ValueError('The environment variable must be PROD or TEST')
+    if not runcontext_gcp_region:
+        raise ValueError('The GCP Region must be implemented')
+    if not runcontext_gcp_project_id:
+        raise ValueError('The project ID must be implemented')
 
+    # It reads the workflows that handles the patterns and what to execute
     workflows_config = configparser.RawConfigParser()
     workflows_config.read(f'{gcf_syspath}/workflows.ini')
     workflows_dict = dict(workflows_config)
 
+    # It read the infraestructure file required to know the structure of the project
     infra_config = configparser.RawConfigParser()
     infra_config.read(f'{gcf_syspath}/infra.ini')
     infra_dict = dict(infra_config)
@@ -65,6 +71,7 @@ def main(event, context):
     file_path = data_dict["name"]
     file_name = file_path.split("/")[-1]
 
+    # It looks for the workflow config that matches the first pattern
     file_config = get_config_that_matches(string=file_name,
                                           workflows_dict=workflows_dict)
 
@@ -83,8 +90,10 @@ def main(event, context):
             "raw_prefix": file_config["raw_prefix"],
             'analytics_bucket': infra_config[runcontext_environment]["analytics_bucket"],
             "staging_dataset": infra_config[runcontext_environment]["staging_dataset"],
-            "dataflow_template": file_config["dataflow_job"]
         }
+
+    if "dataflow_job" in file_config:
+        workflows_arguments["dataflow_template"] = file_config["dataflow_job"]
 
     ############## WORKFLOW EXECUTION    ##########################
     # Init the client

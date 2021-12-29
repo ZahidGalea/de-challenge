@@ -1,3 +1,5 @@
+import configparser
+
 import pytest
 import os
 from logging import getLogger
@@ -20,6 +22,14 @@ def context():
 
     context = Context()
     return context
+
+
+@pytest.fixture(scope='session')
+def infraestructure_config_file(logger) -> dict:
+    infra_config = configparser.RawConfigParser()
+    infra_config.read(f'src/resources/infra.ini')
+    infra_dict = dict(infra_config)
+    return infra_dict
 
 
 @pytest.fixture(scope='session')

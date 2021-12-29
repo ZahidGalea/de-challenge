@@ -43,6 +43,16 @@ def blob_exists(bucket_name, file_name, storage_client):
     return storage.Blob(bucket=bucket, name=file_name).exists(storage_client)
 
 
+def workflow_exists(workflow_parent_path, workflow_to_check_name):
+    from google.cloud.workflows import WorkflowsClient
+    # projects/{project}/locations/{location}
+    client = WorkflowsClient()
+    for workflow in client.list_workflows(parent=workflow_parent_path):
+        if workflow.name.split("/")[-1] == workflow_to_check_name:
+            return True
+    return False
+
+
 def request_a_cloud_function_http(function_path: str, data: dict):
     import requests
     response = requests.post(url=function_path, json=data)

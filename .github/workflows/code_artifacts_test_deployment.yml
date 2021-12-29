@@ -9,8 +9,12 @@ name: "Code & Artifacts deployment"
         description: 'GCP CI/CD Service Account'
         required: true
 
+env:
+  GCP_PROJECT_ID: de-challengue-test
+  ARTIFACTS_BUCKET: de-challengue-test-artifacts
+
 jobs:
-  workflows-deployment-test:
+  workflows-deployment:
     runs-on: ubuntu-latest
     environment: test
     steps:
@@ -30,6 +34,7 @@ jobs:
         run: gcloud workflows deploy metacritic --source=src/main/workflows/metacritic.yml
       - name: 'Deploy of undefined_files'
         run: gcloud workflows deploy undefined_files --source=src/main/workflows/undefined_files.yml
+
   workflows-trigger-gcf-deployment:
     runs-on: ubuntu-latest
     environment: prod
@@ -57,3 +62,50 @@ jobs:
             --region us-central1 \
             --memory 128MB \
             --set-env-vars ENVIRONMENT=TEST
+
+
+
+  dataflow-flex-tmpl-deployment:
+    runs-on: ubuntu-latest
+    environment: prod
+    steps:
+      - uses: actions/checkout@v2
+      - id: 'auth'
+        name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@v0'
+        with:
+          credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v0
+
+      - name: 'Check gcloud CLI'
+        run: 'gcloud info'
+
+      - name: 'Deploy of Dataflow Template to Container Registry'
+        run: gcloud builds submit --tag "$TEMPLATE_IMAGE" .
+        env:
+          TEMPLATE_IMAGE: gcr:io/${{ env.GCP_PROJECT_ID }}/dataflow/result_csv:latest
+
+      - name: 'Save Dataflow Template to GCS'
+        run: |
+          gcloud dataflow flex-template build $TEMPLATE_PATH \
+            --image "$TEMPLATE_IMAGE" --sdk-language "PYTHON" \
+            --metadata-file "src/main/python/dataflow/result_csv/metadata.json"
+        env:
+          TEMPLATE_PATH: gs://${{ env.ARTIFACTS_BUCKET }}/dataflow_templates/result_csv.json
+
+# export TEMPLATE_PATH="gs://$BUCKET/samples/dataflow/templates/streaming-beam.json"
+#
+## Build the Flex Template.
+# gcloud dataflow flex-template build $TEMPLATE_PATH \
+#  --image "$TEMPLATE_IMAGE" \
+#  --sdk-language "PYTHON" \
+#  --metadata-file "metadata.json"
+
+#   python -m examples.mymodule \
+#    --runner DataflowRunner \
+#    --project PROJECT_ID \
+#    --staging_location gs://BUCKET_NAME/staging \
+#    --temp_location gs://BUCKET_NAME/temp \
+#    --template_location gs://BUCKET_NAME/templates/TEMPLATE_NAME \
+#    --region REGION
