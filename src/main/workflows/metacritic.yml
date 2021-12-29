@@ -26,10 +26,9 @@ main:
               environment:
                 additionalExperiments: [ "enable_prime" ]
                 #tempLocation: ...
-              jobName: ${"metacritics-"+ workflow_parameters_object.source_file}
+              jobName: metacritics
               parameters:
                 input_file: ${"gs://" + copyResult.bucket + "/" + copyResult.name}
                 analytics_bucket: ${workflow_parameters_object.analytics_bucket}
                 staging_dataset: ${workflow_parameters_object.staging_dataset}
-              update: true
         result: launchResult
