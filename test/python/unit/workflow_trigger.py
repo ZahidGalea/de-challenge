@@ -1,16 +1,10 @@
-import base64
-import logging
 import time
 
-import pytest
-from unittest import mock
-import os
-from src.main.python.google_cloud_functions.workflow_trigger import main as workflow_trigger_main
-from pytest_bdd import scenario, given, when, then, parsers
-from src.test.python.utils.resources_handler import workflow_exists, blob_exists, gcs_storage_upload_blob
+from pytest_bdd import scenario, given, then, parsers
+from test.python.utils.resources_handler import workflow_exists, blob_exists, gcs_storage_upload_blob
 
 
-@scenario('datapipeline/pipeline_framework.feature',
+@scenario('../../../features/datapipeline/pipeline_framework.feature',
           'El archivo result.csv llega al bucket landing y se ejecuta la ETL')
 def test_workflow_trigger(context):
     pass

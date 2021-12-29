@@ -1,10 +1,7 @@
 import configparser
-
 import pytest
-import os
 from logging import getLogger
 from logging.config import fileConfig
-from google.api_core.exceptions import NotFound
 
 fileConfig('logging_config.ini')
 TEST_INFRA_DECLARATION_JSON = "./ltdc-iac/environments/wom-control-tower-dev/variable_declaration.tfvars.json"
