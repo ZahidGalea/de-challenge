@@ -9,24 +9,26 @@ main:
           sourceBucket: ${workflow_parameters_object.source_bucket}
           sourceObject: ${workflow_parameters_object.source_file}
         result: copyResult
-#    - delete_from_landing:
-#        call: googleapis.storage.v1.objects.delete
-#        args:
-#          bucket: ${workflow_parameters_object.source_bucket}
-#          object: ${workflow_parameters_object.source_file}
-#        result: deleteResult
+    - delete_from_landing:
+        call: googleapis.storage.v1.objects.delete
+        args:
+          bucket: ${workflow_parameters_object.source_bucket}
+          object: ${workflow_parameters_object.source_file}
+        result: deleteResult
     - executes_dataflow_job:
         call: googleapis.dataflow.v1b3.projects.templates.launch
         args:
           projectId: ${sys.get_env("GOOGLE_CLOUD_PROJECT_ID")}
-          gcsPath: ${"gs://"+ workflow_parameters_object.artifacts_bucket + "/dataflow_templates/" + workflow_parameters_object.dataflow_template}
+          containerSpecGcsPath: ${"gs://"+ workflow_parameters_object.artifacts_bucket + "/dataflow_templates/" + workflow_parameters_object.dataflow_template}
           location: "us-central1"
           body:
             environment:
-              additionalExperiments: ["enable_prime"]
+              additionalExperiments: [ "enable_prime" ]
               #tempLocation: ...
-              #zone: ...
             jobName: ${"metacritics-"+ workflow_parameters_object.source_file}
-            #parameters: ...
+            parameters:
+              input_file: ${"gs://" + copyResult.bucket + "/" + copyResult.name}
+              analytics_bucket: ${workflow_parameters_object.analytics_bucket}
+              staging_dataset: ${workflow_parameters_object.staging_dataset}
             update: true
         result: launchResult
