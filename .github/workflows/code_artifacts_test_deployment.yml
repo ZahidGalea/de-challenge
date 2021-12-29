@@ -30,9 +30,12 @@ jobs:
       - name: 'Check gcloud CLI'
         run: 'gcloud info'
       - name: 'Utils in context'
-        run:  . resources/deploy/utils.sh
+        id: 'utils'
+        run: . resources/deploy/utils.sh
+        shell: bash
       - name: 'Deploy of consoles_dim'
         run: gcloud_workflows_deploy consoles_dim src/main/workflows/consoles_dim.yml
+        shell: bash
       - name: 'Deploy of metacritic'
         run: gcloud_workflows_deploy metacritic src/main/workflows/metacritic.yml
       - name: 'Deploy of undefined_files'
