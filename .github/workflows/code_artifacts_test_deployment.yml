@@ -82,17 +82,18 @@ jobs:
         run: 'gcloud info'
 
       - name: 'Deploy of Dataflow Template to Container Registry'
-        run: gcloud builds submit --tag "$TEMPLATE_IMAGE" .
+        run: gcloud builds submit --tag "${{ env.TEMPLATE_IMAGE }}" .
         env:
           TEMPLATE_IMAGE: gcr:io/${{ env.GCP_PROJECT_ID }}/dataflow/result_csv:latest
 
       - name: 'Save Dataflow Template to GCS'
         run: |
-          gcloud dataflow flex-template build $TEMPLATE_PATH \
-            --image "$TEMPLATE_IMAGE" --sdk-language "PYTHON" \
+          gcloud dataflow flex-template build ${{ env.TEMPLATE_PATH }} \
+            --image "${{ env.TEMPLATE_IMAGE }}" --sdk-language "PYTHON" \
             --metadata-file "src/main/python/dataflow/result_csv/metadata.json"
         env:
           TEMPLATE_PATH: gs://${{ env.ARTIFACTS_BUCKET }}/dataflow_templates/result_csv.json
+          TEMPLATE_IMAGE: gcr:io/${{ env.GCP_PROJECT_ID }}/dataflow/result_csv:latest
 
 # export TEMPLATE_PATH="gs://$BUCKET/samples/dataflow/templates/streaming-beam.json"
 #
