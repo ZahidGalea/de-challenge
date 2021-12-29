@@ -5,7 +5,13 @@ main:
         call: googleapis.storage.v1.objects.copy
         args:
           destinationBucket: ${workflow_parameters_object.raw_bucket}
-          destinationObject: ${workflow_parameters_object.raw_prefix + "/" + workflow_parameters_object.source_file}
+          destinationObject: ${workflow_parameters_object.raw_prefix + "%2F" + workflow_parameters_object.source_file}
           sourceBucket: ${workflow_parameters_object.source_bucket}
           sourceObject: ${workflow_parameters_object.source_file}
         result: copyResult
+    - delete_from_landing:
+        call: googleapis.storage.v1.objects.copy
+        args:
+          bucket: ${workflow_parameters_object.source_bucket}
+          object: ${workflow_parameters_object.source_file}
+        result: deleteResult

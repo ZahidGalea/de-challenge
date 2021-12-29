@@ -2,8 +2,9 @@ from logging import getLogger
 import os
 
 
-def gcs_storage_upload_blob(bucket_name, source_file_name, destination_blob_name,
-                            gcp_storage_client, logger=getLogger()):
+def gcs_storage_upload_blob(bucket_name, source_file_name, destination_blob_name, logger=getLogger()):
+    from google.cloud import storage
+    gcp_storage_client = storage.Client()
     try:
         bucket = gcp_storage_client.bucket(bucket_name)
         blob = bucket.blob(destination_blob_name)
@@ -16,7 +17,9 @@ def gcs_storage_upload_blob(bucket_name, source_file_name, destination_blob_name
     return True
 
 
-def clean_all_blobs_in_bucket(bucket_name, gcp_storage_client):
+def clean_all_blobs_in_bucket(bucket_name):
+    from google.cloud import storage
+    gcp_storage_client = storage.Client()
     try:
         blobs = gcp_storage_client.list_blobs(bucket_name)
         if blobs:
@@ -27,7 +30,9 @@ def clean_all_blobs_in_bucket(bucket_name, gcp_storage_client):
     return True
 
 
-def clean_all_tables_in_dataset(dataset_name, gcp_bigquery_client):
+def clean_all_tables_in_dataset(dataset_name):
+    from google.cloud.bigquery.client import Client
+    gcp_bigquery_client = Client()
     try:
         tables = list(gcp_bigquery_client.list_tables(dataset_name))  # Make an API request(s).
         if tables:
@@ -37,10 +42,11 @@ def clean_all_tables_in_dataset(dataset_name, gcp_bigquery_client):
         return e
 
 
-def blob_exists(bucket_name, file_name, storage_client):
+def blob_exists(bucket_name, file_name):
     from google.cloud import storage
+    storage_client = storage.Client()
     bucket = storage_client.bucket(bucket_name)
-    return storage.Blob(bucket=bucket, name=file_name).exists(storage_client)
+    return storage.Blob(bucket=bucket, name=file_name).exists()
 
 
 def workflow_exists(workflow_parent_path, workflow_to_check_name):
@@ -59,7 +65,9 @@ def request_a_cloud_function_http(function_path: str, data: dict):
     return response
 
 
-def upload_folder_to_gcs(bucket_name, target_prefix, source_folder, gcp_storage_client, logger=getLogger()):
+def upload_folder_to_gcs(bucket_name, target_prefix, source_folder, logger=getLogger()):
+    from google.cloud import storage
+    gcp_storage_client = storage.Client()
     for root, dirs, files in os.walk(source_folder):
         try:
             for file in files:

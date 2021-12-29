@@ -98,18 +98,3 @@ jobs:
 
           TEMPLATE_IMAGE: gcr.io/${{ env.GCP_PROJECT_ID }}/dataflow/result_csv:latest
 
-# export TEMPLATE_PATH="gs://$BUCKET/samples/dataflow/templates/streaming-beam.json"
-#
-## Build the Flex Template.
-# gcloud dataflow flex-template build $TEMPLATE_PATH \
-#  --image "$TEMPLATE_IMAGE" \
-#  --sdk-language "PYTHON" \
-#  --metadata-file "metadata.json"
-
-#   python -m examples.mymodule \
-#    --runner DataflowRunner \
-#    --project PROJECT_ID \
-#    --staging_location gs://BUCKET_NAME/staging \
-#    --temp_location gs://BUCKET_NAME/temp \
-#    --template_location gs://BUCKET_NAME/templates/TEMPLATE_NAME \
-#    --region REGION

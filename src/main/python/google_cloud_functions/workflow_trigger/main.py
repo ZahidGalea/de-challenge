@@ -8,8 +8,6 @@ from google.cloud.workflows.executions_v1.types import executions
 
 import configparser
 
-gcf_syspath = os.path.dirname(__file__)
-
 
 def build_file_identifier(file_name):
     return ''.join(filter(str.isalpha, file_name.split(".")[0]))
@@ -36,7 +34,7 @@ def main(event, context):
          metadata. The `event_id` field contains the Pub/Sub message ID. The
          `timestamp` field contains the publish time.
     """
-
+    gcf_syspath = os.path.dirname(__file__)
     runcontext_gcp_project_id = os.environ.get("GCP_PROJECT")
     runcontext_gcp_region = os.environ.get("FUNCTION_REGION")
     runcontext_environment = os.environ.get("ENVIRONMENT")
@@ -88,8 +86,10 @@ def main(event, context):
             "source_file": f'{file_name}',
             "raw_bucket": infra_config[runcontext_environment]["raw_bucket"],
             "raw_prefix": file_config["raw_prefix"],
-            'analytics_bucket': infra_config[runcontext_environment]["analytics_bucket"],
+            "analytics_bucket": infra_config[runcontext_environment]["analytics_bucket"],
             "staging_dataset": infra_config[runcontext_environment]["staging_dataset"],
+            "artifacts_bucket": infra_config[runcontext_environment]["artifacts_bucket"],
+            #"temp-buckets":
         }
 
     if "dataflow_job" in file_config:
