@@ -26,6 +26,7 @@ def run(input_file: str,
         staging_dataset: str,
         execution_date: str,
         target_project_id: str,
+        raw_bucket: str,
         beam_args):
     options = PipelineOptions(beam_args, save_main_session=True, streaming=False)
 
@@ -37,7 +38,7 @@ def run(input_file: str,
 
         # It reads metacritics and consoles files from GCS
         metacritics = pipeline | 'Read from GCS Metacritics' >> read_csv(input_file)
-        consoles = pipeline | 'Read from GCS Consoles' >> read_csv('consoles.csv')
+        consoles = pipeline | 'Read from GCS Consoles' >> read_csv(f'gs://{raw_bucket}/consoles/consoles.csv')
 
         # Sets the index to be able to join in parallelize mode
         metacritics = metacritics.set_index(["console"])
@@ -59,7 +60,7 @@ def run(input_file: str,
                                   "userscore": string_input[3],
                                   "date": string_input[4],
                                   "company": string_input[5]})
-         | "Write to BQ" >> WriteToBigQuery(table=f"{target_project_id}:{staging_dataset}.metacritics_base",
+         | "Write to BQ" >> WriteToBigQuery(table=f"{target_project_id}:{staging_dataset}.metacritic_model",
                                             schema=METACRITIC_SCHEMA,
                                             write_disposition=beam.io.BigQueryDisposition.WRITE_TRUNCATE,
                                             create_disposition=beam.io.BigQueryDisposition.CREATE_IF_NEEDED,
@@ -128,6 +129,10 @@ if __name__ == "__main__":
         "--target_project_id",
         help="Execution date to add to the records and file",
     )
+    parser.add_argument(
+        "--raw_bucket",
+        help="Execution date to add to the records and file",
+    )
     args, beam_args = parser.parse_known_args()
 
     run(
@@ -136,5 +141,6 @@ if __name__ == "__main__":
         staging_dataset=args.staging_dataset,
         execution_date=args.execution_date,
         target_project_id=args.target_project_id,
+        raw_bucket=args.raw_bucket,
         beam_args=beam_args
     )

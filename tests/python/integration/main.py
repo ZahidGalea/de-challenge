@@ -1,4 +1,5 @@
 import time
+from datetime import datetime
 
 from pytest_bdd import scenario, given, then, parsers
 from tests.python.utils.resources_handler import workflow_exists, blob_exists, gcs_storage_upload_blob, table_exists
@@ -46,10 +47,12 @@ def step_impl(context, infraestructure_config_file, file_result_in_raw, logger):
 
 @then(parsers.parse("se valida la existencia de la tabla {modelo} en el dataset staging con los datos del archivo"))
 def step_impl(context, modelo, infraestructure_config_file):
+    time.sleep(420)
     assert table_exists(dataset_name=infraestructure_config_file["TEST"]["staging_dataset"],
                         table=modelo)
 
 
 @then(parsers.parse("se valida la existencia de los {lista_archivos} en el bucket de analytics"))
 def step_impl(context, lista_archivos):
-    NotImplementedError('Not implemented')
+    datetime_now = datetime.date(datetime.now()).strftime("%Y%m%d")
+

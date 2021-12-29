@@ -33,4 +33,5 @@ main:
                 staging_dataset: ${workflow_parameters_object.staging_dataset}
                 execution_date: ${workflow_parameters_object.execution_date}
                 target_project_id: ${sys.get_env("GOOGLE_CLOUD_PROJECT_ID")}
+                raw_bucket: ${workflow_parameters_object.raw_bucket}
         result: launchResult
