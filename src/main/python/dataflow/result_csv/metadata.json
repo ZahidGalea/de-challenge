@@ -19,6 +19,12 @@
       "label": "Staging Bigquery dataset",
       "helpText": "RAW Bucket for outputs",
       "isOptional": false
+    },
+        {
+      "name": "execution_date",
+      "label": "Execution date that will be appended to results and result files",
+      "helpText": "Execution date",
+      "isOptional": false
     }
   ]
 }

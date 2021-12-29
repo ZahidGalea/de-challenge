@@ -1,7 +1,22 @@
 # DE Challengue Solution
 
 ---
+## Draft - TODO:
 
+* Desing & Architecture :white_check_mark:
+* Infraestructure base with terraform :white_check_mark:
+* Automatic deployment with Github actions :white_check_mark:
+* Folder generation structure :white_check_mark:
+* Gherking feature creation :white_check_mark:
+* Tests with pytest bdd creation and automated execution :white_check_mark:
+* Workflow trigger GCF creation and deployment :white_check_mark:
+* Workflows yaml creation and deployment :white_check_mark:
+* Dataflow template creation
+* Latest test fixes 
+* Last documentation
+* Steps to reproduce documentation
+
+---
 
 ## Requirements Resume
 
@@ -52,3 +67,6 @@ https://lucid.app/lucidchart/3bdfd770-c1cc-4921-8986-bd8602bc7404/edit?invitatio
 
 
 ## Steps to reproduce
+
+
+

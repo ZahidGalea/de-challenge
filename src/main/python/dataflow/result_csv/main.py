@@ -1,49 +1,97 @@
 import argparse
-import json
+import csv
 import logging
-import time
-from typing import Any, Dict, List
 
 import apache_beam as beam
+from apache_beam import dataframe
 from apache_beam.options.pipeline_options import PipelineOptions
+from apache_beam.dataframe.io import read_csv
+from apache_beam.io.gcp.bigquery import WriteToBigQuery
+from apache_beam.dataframe.convert import to_pcollection
 
-# Defines the BigQuery schema for the output table.
 METACRITIC_SCHEMA = ",".join(
     [
-        "url:STRING",
-        "num_reviews:INTEGER",
-        "score:FLOAT64",
-        "first_date:TIMESTAMP",
-        "last_date:TIMESTAMP",
+        "console:STRING",
+        "metascore:STRING",
+        "name:STRING",
+        "userscore:STRING",
+        "date:STRING",
+        "company:STRING"
     ]
 )
 
 
-def parse_json_message(message: str) -> Dict[str, Any]:
-    """Parse the input json message and add 'score' & 'processing_time' keys."""
-    row = json.loads(message)
-    return {
-        "url": row["url"],
-        "score": 1.0 if row["review"] == "positive" else 0.0,
-        "processing_time": int(time.time()),
-    }
-
-
-def run(
-        input_file: str,
-        analytics_bucket: str,
-        staging_dataset: str,
-        beam_args: List[str] = None) -> None:
-    """Build and run the pipeline."""
+def run(input_file: str, analytics_bucket: str, staging_dataset: str, execution_date: str, beam_args):
     options = PipelineOptions(beam_args, save_main_session=True, streaming=False)
 
     with beam.Pipeline(options=options) as pipeline:
-        pass
+        def add_metadata_to_dataframe(df):
+            df["file_origen"] = input_file
+            df["execution_Date"] = execution_date
+            return df
 
-        # Output the results into BigQuery table.
-        # _ = messages | "Write to Big Query" >> beam.io.WriteToBigQuery(
-        #     "metacritic", schema=METACRITIC_SCHEMA
-        # )
+        # It reads metacritics and consoles files from GCS
+        metacritics = pipeline | 'Read from GCS Metacritics' >> read_csv(input_file)
+        consoles = pipeline | 'Read from GCS Consoles' >> read_csv('consoles.csv')
+
+        # Sets the index to be able to join in parallelize mode
+        metacritics = metacritics.set_index(["console"])
+        consoles = consoles.set_index(["console"])
+        base = metacritics.merge(consoles, left_index=True, right_index=True, validate="many_to_one")
+
+        with dataframe.allow_non_parallel_operations():
+            base = base.reset_index()
+
+        ###################
+        # Bigquery Upload
+        ###################
+
+        pcoll_base = to_pcollection(base)
+
+        (pcoll_base | "FlatMap" >> beam.FlatMap(lambda elements: elements)
+         | "Write to BQ" >> WriteToBigQuery(table=f"{staging_dataset}.metacritics_base",
+                                            #schema=METACRITIC_SCHEMA,
+                                            write_disposition=beam.io.BigQueryDisposition.WRITE_TRUNCATE,
+                                            create_disposition=beam.io.BigQueryDisposition.CREATE_IF_NEEDED,
+                                            method="FILE_LOAD"))
+
+        ###################
+        # Report Generation
+        ###################
+
+        # - The top 10 best games for each console/company. ####
+        top_10_games_for_each_console = base[["company", "console", "name", "metascore"]].groupby(
+            ["company", "console", "name"]).mean() \
+            .nlargest(10, columns=["metascore"], keep='any')
+
+        top_10_games_for_each_console = add_metadata_to_dataframe(top_10_games_for_each_console)
+        top_10_games_for_each_console.to_csv(f'gs://{analytics_bucket}/top_10_games_by_console_{execution_date}.csv',
+                                             quoting=csv.QUOTE_NONNUMERIC)
+
+        # - The worst 10 games for each console/company. ####
+        worst_10_games_for_each_console = base[["name", "metascore"]].groupby("name").mean() \
+            .nsmallest(10, columns=["metascore"], keep='any')
+
+        worst_10_games_for_each_console = add_metadata_to_dataframe(worst_10_games_for_each_console)
+        worst_10_games_for_each_console.to_csv(
+            f'gs://{analytics_bucket}/worst_10_games_by_console_{execution_date}.csv',
+            quoting=csv.QUOTE_NONNUMERIC)
+
+        # - The top 10 best games for all consoles. ####
+        top_10_games_for_all_consoles = base[["name", "metascore"]].groupby("name").mean() \
+            .nlargest(10, columns=["metascore"], keep='any')
+
+        top_10_games_for_all_consoles = add_metadata_to_dataframe(top_10_games_for_all_consoles)
+        top_10_games_for_all_consoles.to_csv(f'gs://{analytics_bucket}/top_10_games_{execution_date}.csv',
+                                             quoting=csv.QUOTE_NONNUMERIC)
+
+        # - The worst 10 games for all consoles. ####
+        worst_10_for_all_consoles = base[["name", "metascore"]].groupby("name").mean(). \
+            nsmallest(10, columns=["metascore"], keep='any')
+
+        worst_10_for_all_consoles = add_metadata_to_dataframe(worst_10_for_all_consoles)
+        worst_10_for_all_consoles.to_csv(f'gs://{analytics_bucket}/worst_10_games_{execution_date}.csv',
+                                         quoting=csv.QUOTE_NONNUMERIC)
 
 
 if __name__ == "__main__":
@@ -62,11 +110,16 @@ if __name__ == "__main__":
         "--staging_dataset",
         help="Dataset where the file will be load into Bigquery",
     )
+    parser.add_argument(
+        "--execution_date",
+        help="Execution date to add to the records and file",
+    )
     args, beam_args = parser.parse_known_args()
 
     run(
         input_file=args.input_file,
         analytics_bucket=args.analytics_bucket,
         staging_dataset=args.staging_dataset,
+        execution_date=args.execution_date,
         beam_args=beam_args
     )

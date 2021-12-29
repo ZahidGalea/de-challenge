@@ -42,5 +42,6 @@ ENV PATH $PATH:/usr/local/gcloud/google-cloud-sdk/bin
 RUN apt-get install jq -y
 
 RUN pip install apache-beam[gcp]
+RUN pip install apache_beam[dataframe]
 
 CMD /bin/bash
