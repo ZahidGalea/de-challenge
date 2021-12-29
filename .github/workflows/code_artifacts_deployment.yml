@@ -2,17 +2,20 @@
 name: "Code & Artifacts deployment"
 
 "on":
-  pull_request:
+  push:
+    branches:
+      - main
   workflow_call:
     secrets:
       GOOGLE_APPLICATION_CREDENTIALS:
         description: 'GCP CI/CD Service Account'
         required: true
+  workflow_dispatch:
 
 jobs:
-  workflows-deployment-test:
+  workflows-deployment:
     runs-on: ubuntu-latest
-    environment: test
+    environment: prod
     steps:
       - uses: actions/checkout@v2
       - id: 'auth'
@@ -56,4 +59,5 @@ jobs:
             --clear-max-instances \
             --region us-central1 \
             --memory 128MB \
-            --set-env-vars ENVIRONMENT=TEST
+            --set-env-vars ENVIRONMENT=PROD
+

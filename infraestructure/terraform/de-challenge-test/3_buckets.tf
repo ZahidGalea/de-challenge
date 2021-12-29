@@ -55,7 +55,7 @@ resource "google_storage_notification" "object_landing_notification" {
 
 resource "google_pubsub_topic" "ldn_arrive_topic" {
   provider = google
-  name     = local.metascore-ldn-pubsub-topic
+  name     = local.ldn-pubsub-topic
   project  = local.project_id
 }
 
@@ -79,23 +79,23 @@ resource "google_pubsub_topic_iam_binding" "ldn_arrive_binding" {
 ################
 
 locals {
-  metascore-ldn              = "metascore-lnd"
-  metascore-ldn-pubsub-topic = "metascore-lnd-notification"
-  metascore-raw              = "metascore-raw"
-  metascore-analytics        = "metascore-analytics"
-  metascore-owners-access    = [
+  metascore-ldn           = "metascore-lnd"
+  ldn-pubsub-topic        = "lnd-notification"
+  metascore-raw           = "metascore-raw"
+  metascore-analytics     = "metascore-analytics"
+  metascore-owners-access = [
   for owner in local.owner_users : {
     role   = "roles/storage.objectAdmin",
     member = "user:${owner}"
   }
   ]
-  metascore-editor-access    = [
+  metascore-editor-access = [
   for editor in local.editor_users : {
     role   = "roles/storage.objectAdmin",
     member = "user:${editor}"
   }
   ]
-  metascore-viewer-access    = [
+  metascore-viewer-access = [
   for viewer in local.viewer_users : {
     role   = "roles/storage.objectViewer",
     member = "user:${viewer}"
