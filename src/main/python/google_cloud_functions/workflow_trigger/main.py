@@ -2,6 +2,7 @@ import base64
 import json
 import os
 import re
+from datetime import datetime
 
 from google.cloud.workflows.executions_v1.services.executions import async_client
 from google.cloud.workflows.executions_v1.types import executions
@@ -74,6 +75,8 @@ def main(event, context):
                                           workflows_dict=workflows_dict)
 
     ############## ARGUMENTS PREPARATION ##########################
+
+    datetime_now = datetime.date(datetime.now()).strftime("%Y%m%d")
     if file_config.name == "DEFAULT":
         workflows_arguments = {
             "source_bucket": f'{file_bucket}',
@@ -89,7 +92,8 @@ def main(event, context):
             "analytics_bucket": infra_config[runcontext_environment]["analytics_bucket"],
             "staging_dataset": infra_config[runcontext_environment]["staging_dataset"],
             "artifacts_bucket": infra_config[runcontext_environment]["artifacts_bucket"],
-            #"temp-buckets":
+            "temporary_bucket": infra_config[runcontext_environment]["temporary_bucket"],
+            "execution_date": datetime_now
         }
 
     if "dataflow_job" in file_config:

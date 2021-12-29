@@ -20,10 +20,16 @@
       "helpText": "RAW Bucket for outputs",
       "isOptional": false
     },
-        {
+    {
       "name": "execution_date",
       "label": "Execution date that will be appended to results and result files",
       "helpText": "Execution date",
+      "isOptional": false
+    },
+    {
+      "name": "target_project_id",
+      "label": "Target project id of the bigquery table",
+      "helpText": "GCP Project id",
       "isOptional": false
     }
   ]

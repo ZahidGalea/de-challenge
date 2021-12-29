@@ -25,10 +25,12 @@ main:
               containerSpecGcsPath: ${"gs://"+ workflow_parameters_object.artifacts_bucket + "/dataflow_templates/" + workflow_parameters_object.dataflow_template}
               environment:
                 additionalExperiments: [ "enable_prime" ]
-                #tempLocation: ...
+                tempLocation: ${workflow_parameters_object.temporary_bucket}
               jobName: metacritics
               parameters:
                 input_file: ${"gs://" + copyResult.bucket + "/" + copyResult.name}
                 analytics_bucket: ${workflow_parameters_object.analytics_bucket}
                 staging_dataset: ${workflow_parameters_object.staging_dataset}
+                execution_date: ${workflow_parameters_object.execution_date}
+                target_project_id: ${sys.get_env("GOOGLE_CLOUD_PROJECT_ID")}
         result: launchResult

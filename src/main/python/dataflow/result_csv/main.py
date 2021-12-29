@@ -12,16 +12,21 @@ from apache_beam.dataframe.convert import to_pcollection
 METACRITIC_SCHEMA = ",".join(
     [
         "console:STRING",
-        "metascore:STRING",
+        "metascore:INTEGER",
         "name:STRING",
         "userscore:STRING",
-        "date:STRING",
+        "date:DATETIME",
         "company:STRING"
     ]
 )
 
 
-def run(input_file: str, analytics_bucket: str, staging_dataset: str, execution_date: str, beam_args):
+def run(input_file: str,
+        analytics_bucket: str,
+        staging_dataset: str,
+        execution_date: str,
+        target_project_id: str,
+        beam_args):
     options = PipelineOptions(beam_args, save_main_session=True, streaming=False)
 
     with beam.Pipeline(options=options) as pipeline:
@@ -46,11 +51,16 @@ def run(input_file: str, analytics_bucket: str, staging_dataset: str, execution_
         # Bigquery Upload
         ###################
 
-        pcoll_base = to_pcollection(base)
-
-        (pcoll_base | "FlatMap" >> beam.FlatMap(lambda elements: elements)
-         | "Write to BQ" >> WriteToBigQuery(table=f"{staging_dataset}.metacritics_base",
-                                            #schema=METACRITIC_SCHEMA,
+        pc_base = to_pcollection(base.astype(str), yield_elements='schemas')
+        (pc_base | 'String to BigQuery Row' >> beam.Map(
+            lambda string_input: {"console": string_input[0],
+                                  "metascore": int(string_input[1]),
+                                  "name": string_input[2],
+                                  "userscore": string_input[3],
+                                  "date": string_input[4],
+                                  "company": string_input[5]})
+         | "Write to BQ" >> WriteToBigQuery(table=f"{target_project_id}:{staging_dataset}.metacritics_base",
+                                            schema=METACRITIC_SCHEMA,
                                             write_disposition=beam.io.BigQueryDisposition.WRITE_TRUNCATE,
                                             create_disposition=beam.io.BigQueryDisposition.CREATE_IF_NEEDED,
                                             method="FILE_LOAD"))
@@ -114,6 +124,10 @@ if __name__ == "__main__":
         "--execution_date",
         help="Execution date to add to the records and file",
     )
+    parser.add_argument(
+        "--target_project_id",
+        help="Execution date to add to the records and file",
+    )
     args, beam_args = parser.parse_known_args()
 
     run(
@@ -121,5 +135,6 @@ if __name__ == "__main__":
         analytics_bucket=args.analytics_bucket,
         staging_dataset=args.staging_dataset,
         execution_date=args.execution_date,
+        target_project_id=args.target_project_id,
         beam_args=beam_args
     )
