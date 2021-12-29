@@ -43,7 +43,6 @@ gcloud_workflows_deploy() {
   export workflow_name="$1"
   export source="$2"
 
-  gcloud workflows deploy $workflow_name \
-    --source=$source
+  gcloud workflows deploy $workflow_name --source=$source
 
 }

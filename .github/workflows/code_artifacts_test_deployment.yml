@@ -29,14 +29,9 @@ jobs:
         uses: google-github-actions/setup-gcloud@v0
       - name: 'Check gcloud CLI'
         run: 'gcloud info'
-      - name: 'Utils in context'
-        id: 'utils'
-        run: . resources/deploy/utils.sh
-        shell: bash
       - name: 'Deploy of consoles_dim'
-        run: gcloud_workflows_deploy consoles_dim src/main/workflows/consoles_dim.yml
-        shell: bash
+        run: gcloud workflows deploy consoles_dim --source=src/main/workflows/consoles_dim.yml
       - name: 'Deploy of metacritic'
-        run: gcloud_workflows_deploy metacritic src/main/workflows/metacritic.yml
+        run: gcloud workflows deploy metacritic --source=src/main/workflows/metacritic.yml
       - name: 'Deploy of undefined_files'
-        run: gcloud_workflows_deploy undefined_files src/main/workflows/undefined_files.yml
+        run: gcloud workflows deploy undefined_files --source=src/main/workflows/undefined_files.yml
