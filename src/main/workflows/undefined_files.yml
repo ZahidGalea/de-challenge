@@ -9,3 +9,9 @@ main:
           sourceBucket: ${workflow_parameters_object.source_bucket}
           sourceObject: ${workflow_parameters_object.source_file}
         result: copyResult
+    - delete_from_landing:
+        call: googleapis.storage.v1.objects.delete
+        args:
+          bucket: ${workflow_parameters_object.source_bucket}
+          object: ${workflow_parameters_object.source_file}
+        result: deleteResult
