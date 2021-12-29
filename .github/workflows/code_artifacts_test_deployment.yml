@@ -13,11 +13,6 @@ jobs:
   workflows-deployment-test:
     runs-on: ubuntu-latest
     environment: test
-    strategy:
-      matrix:
-        workflow_files: [ src/main/workflows/consoles_dim.yml,
-                          src/main/workflows/metacritic.yml,
-                          src/main/workflows/undefined_files.yml ]
     steps:
       - uses: actions/checkout@v2
       - id: 'auth'

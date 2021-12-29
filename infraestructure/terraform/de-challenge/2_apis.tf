@@ -28,6 +28,6 @@ locals {
   apis = [
     "iam.googleapis.com", "iamcredentials.googleapis.com", "cloudbuild.googleapis.com", "appengine.googleapis.com",
     "cloudfunctions.googleapis.com", "compute.googleapis.com", "container.googleapis.com", "datastudio.googleapis.com",
-    "storage-component.googleapis.com", "bigquery.googleapis.com", "dataflow.googleapis.com"
+    "storage-component.googleapis.com", "bigquery.googleapis.com", "dataflow.googleapis.com", "workflows.googleapis.com"
   ]
 }
