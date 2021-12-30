@@ -79,7 +79,8 @@ def run(input_file: str,
                                              quoting=csv.QUOTE_NONNUMERIC)
 
         # - The worst 10 games for each console/company. ####
-        worst_10_games_for_each_console = base[["name", "metascore"]].groupby("name").mean() \
+        worst_10_games_for_each_console = base[["company", "console", "name", "metascore"]].groupby(
+            ["company", "console", "name"]).mean() \
             .nsmallest(10, columns=["metascore"], keep='any')
 
         worst_10_games_for_each_console = add_metadata_to_dataframe(worst_10_games_for_each_console)
