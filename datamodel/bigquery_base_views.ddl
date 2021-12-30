@@ -1,3 +1,6 @@
+############
+# Base views
+############
 CREATE OR REPLACE VIEW consumption.metacritic_model_unnested AS
 SELECT company,
        consoles.console_name                  AS console,
@@ -25,3 +28,4 @@ SELECT name,
        userscore,
        metascore
 FROM consumption.metacritic_model_unnested;
+

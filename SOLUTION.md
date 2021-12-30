@@ -140,5 +140,15 @@ locals {
 
 ```
 
-In case if u want to try the project itself in my environment, u should be able to access to google cloud storage, and add a file into the landing bucket.
-You will also be able to look the entire process running.
+In case if u want to try the project itself in my environment, u should be able to access to google cloud storage, and
+add a file into the landing bucket. You will also be able to look the entire process running.
+
+--- 
+
+## Reports
+
+About the required reports they will exists in two places.
+
+* In the analytics bucket as .csv file
+* In the consumption layer of bigquery dataset as views. (construction of them in the file "
+  datamodel/bigquery_reports_views.ddl")
