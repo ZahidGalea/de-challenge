@@ -7,11 +7,7 @@ locals {
   editor_users   = []
   viewer_users   = [
     "Gustavo.Aguilar0@walmart.com",
-    "Mariano.Gonzalez0@walmart.com",
-    "zahid.galea@wom.cl",
-    "gmiguel@acid.cl",
-    "gaguilar@acid.cl",
-    "apecho@acid.cl"
+    "Mariano.Gonzalez0@walmart.com"
   ]
 }
 

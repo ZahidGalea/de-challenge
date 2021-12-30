@@ -6,11 +6,7 @@ locals {
   owner_users    = ["zahidale.zg@gmail.com"]
   editor_users   = [
     "Gustavo.Aguilar0@walmart.com",
-    "Mariano.Gonzalez0@walmart.com",
-    "zahid.galea@wom.cl",
-    "gmiguel@acid.cl",
-    "gaguilar@acid.cl",
-    "apecho@acid.cl"
+    "Mariano.Gonzalez0@walmart.com"
   ]
   viewer_users   = []
 }
