@@ -16,7 +16,7 @@
 * Latest test fixes  :white_check_mark:
 * 3NF Model: :white_check_mark:
 * Last documentation :white_check_mark:
-* Visualization
+* Visualization :white_check_mark:
 * Steps to reproduce documentation :white_check_mark:
 
 ---
