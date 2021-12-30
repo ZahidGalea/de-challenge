@@ -152,3 +152,11 @@ About the required reports they will exists in two places.
 * In the analytics bucket as .csv file
 * In the consumption layer of bigquery dataset as views. (construction of them in the file "
   datamodel/bigquery_reports_views.ddl")
+
+Also you can see the report in datastudio, here:
+
+https://datastudio.google.com/reporting/3a0cde97-2402-4bd1-a826-0ff12b3778c4
+
+It should looks like:
+
+![alt text](img/datastudio.png)
