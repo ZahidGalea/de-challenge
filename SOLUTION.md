@@ -15,9 +15,9 @@
 * Dataflow template creation :white_check_mark:
 * Latest test fixes  :white_check_mark:
 * 3NF Model: :white_check_mark:
-* Last documentation
+* Last documentation :white_check_mark:
 * Visualization
-* Steps to reproduce documentation
+* Steps to reproduce documentation :white_check_mark:
 
 ---
 
@@ -68,13 +68,77 @@ https://lucid.app/lucidchart/3bdfd770-c1cc-4921-8986-bd8602bc7404/edit?invitatio
 
 ## Resume & Workflow
 
-In this challengue I have developed a little framework, that handles the file arrive into a landing GCP Bucket, consolidates it into a Raw bucket.
-afther these previous steps, if a dataflow job declaration exists, it gets executed using the previos raw file. In this case as example, 
+In this challenge I have developed a little framework, that handles the file arrive into a landing GCP Bucket,
+consolidates it into a Raw bucket. after these previous steps, if a dataflow job declaration exists, it gets executed
+using the previous raw file. In this case as example, we upload the files result.csv and consoles.csv, they get joined
+into a single table and get loaded together to bigquery. also in the same dataflow job, extract four reports in .csv
+file in the analytics bucket.
+
 As resume we have the following diagram:
 
+![alt text](img/workflow.png)
 
+---
 
 ## Steps to reproduce
 
+This project exists in two GCP environments (own projects), but can be deployed in another projects if required using
+the GitHub Actions pipeline already created in the project. but first you will have to configure some things like:
 
+* Set GitHub environments: test - prod with the following secret for each one:
+    * GOOGLE_APPLICATION_CREDENTIALS = json value of a Service account key related to a GCP Project with owner
+      permissions
+* Replace on the following files the next key values:
+    * .github/workflows/code_artifacts_deployment.yml
+    * .github/workflows/code_artifacts_test_deployment.yml
 
+```
+env:
+  GCP_PROJECT_ID: de-challengue-test # Replace for your own project ID's
+  ARTIFACTS_BUCKET: de-challengue-test-artifacts # Terraform will create this bucket, 
+  # But you will have to execute it before. or set by just changing the project_id  in the bucket
+```
+
+* You will have to update the properties file related to the infrastructure creation like:
+    * src/resources/infra.ini
+
+```
+[PROD]
+landing_bucket : de-challenge-336404-metascore-lnd # Must replace for your's own resource
+raw_bucket : de-challenge-336404-metascore-raw # Must replace for your's own resource
+analytics_bucket : de-challenge-336404-metascore-raw # Must replace for your's own resource
+staging_dataset : staging
+project_id: de-challenge-336404  # Must replace for your's own resource
+artifacts_bucket : de-challenge-336404-artifacts  # Must replace for your's own resource
+temporary_bucket: de-challenge-336404-temporary-pipeline  # Must replace for your's own resource
+
+[TEST]
+landing_bucket : de-challengue-test-metascore-lnd  # Must replace for your's own resource
+raw_bucket : de-challengue-test-metascore-raw  # Must replace for your's own resource
+analytics_bucket : de-challengue-test-metascore-analytics  # Must replace for your's own resource
+artifacts_bucket : de-challengue-test-artifacts  # Must replace for your's own resource
+staging_dataset : staging
+project_id: de-challengue-test  # Must replace for your's own resource
+temporary_bucket: de-challengue-test-temporary-pipeline  # Must replace for your's own resource
+```
+
+* If you want to create the infrastructure using the project terraform you will have to configure the following to
+  files:
+    * infraestructure/terraform/de-challenge/0_config.tf
+    * infraestructure/terraform/de-challenge-test/0_config.tf
+
+```
+locals {
+  project_id     = "de-challengue-test" # Must replace for your resource
+  project_number = 935901401525 # Must replace for your resource
+  default_region = "us-central1"
+  defaul_zone    = "us-central1-a"
+  owner_users    = ["zahidale.zg@gmail.com"] # Set required persons as IAM Level
+  editor_users   = [ "zahid.galea@wom.cl"] # Set required persons as IAM Level
+  viewer_users   = [] # Set required persons as IAM Level
+}
+
+```
+
+In case if u want to try the project itself in my environment, u should be able to access to google cloud storage, and add a file into the landing bucket.
+You will also be able to look the entire process running.
