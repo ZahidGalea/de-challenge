@@ -6,13 +6,17 @@ locals {
   owner_users    = ["zahidale.zg@gmail.com"]
   editor_users   = [
     "Gustavo.Aguilar0@walmart.com",
-    "Mariano.Gonzalez0@walmart.com"
+    "Mariano.Gonzalez0@walmart.com",
+    "zahid.galea@wom.cl",
+    "gmiguel@acid.cl",
+    "gaguilar@acid.cl",
+    "apecho@acid.cl"
   ]
-  viewer_users   = ["zahid.galea@wom.cl"]
+  viewer_users   = []
 }
 
 provider "google" {
   project = local.project_id
-  zone = local.defaul_zone
-  region = local.default_region
+  zone    = local.defaul_zone
+  region  = local.default_region
 }

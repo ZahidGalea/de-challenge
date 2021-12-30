@@ -4,15 +4,39 @@
   "parameters": [
     {
       "name": "input_file",
-      "label": "Input Cloud Storage file(s)"
+      "label": "Input Cloud Storage file(s)",
+      "helpText": "Input Cloud Storage file(s)",
+      "isOptional": false
     },
     {
       "name": "analytics_bucket",
-      "label": "RAW Bucket for outputs"
+      "label": "RAW Bucket for outputs",
+      "helpText": "RAW Bucket for outputs",
+      "isOptional": false
     },
     {
       "name": "staging_dataset",
-      "label": "Staging Bigquery dataset"
+      "label": "Staging Bigquery dataset",
+      "helpText": "RAW Bucket for outputs",
+      "isOptional": false
+    },
+    {
+      "name": "execution_date",
+      "label": "Execution date that will be appended to results and result files",
+      "helpText": "Execution date",
+      "isOptional": false
+    },
+    {
+      "name": "target_project_id",
+      "label": "Target project id of the bigquery table",
+      "helpText": "GCP Project id",
+      "isOptional": false
+    },
+    {
+      "name": "raw_bucket",
+      "label": "Project RAW Bucket",
+      "helpText": "GCP Raw bucket",
+      "isOptional": false
     }
   ]
 }
