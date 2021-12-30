@@ -18,5 +18,11 @@ Feature: Movimiento de un archivo landing a bigquery y gcs
   Scenario: El archivo consoles.csv llega al bucket landing y se ejecuta la ETL
     Given el workflow consoles_dim deployado en GCP
     And el archivo tests/resources/data/consoles.csv en un bucket landing con el nombre consoles_dim.csv
-    Then se valida el archivo consolidado en raw con el nombre consoles.csv
+    Then se valida el archivo consolidado en raw con el nombre consoles/consoles.csv
+
+
+  Scenario: El archivo sindefinicion.csv llega al bucket landing y se ejecuta la ETL
+    Given el workflow undefined_files deployado en GCP
+    And el archivo tests/resources/data/sindefinicion.csv en un bucket landing con el nombre sindefinicion.csv
+    Then se valida el archivo consolidado en raw con el nombre undefined/sindefinicion.csv
 

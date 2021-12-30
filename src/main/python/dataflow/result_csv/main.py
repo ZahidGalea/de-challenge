@@ -9,17 +9,6 @@ from apache_beam.dataframe.io import read_csv
 from apache_beam.io.gcp.bigquery import WriteToBigQuery
 from apache_beam.dataframe.convert import to_pcollection
 
-METACRITIC_SCHEMA = ",".join(
-    [
-        "console:STRING",
-        "metascore:INTEGER",
-        "name:STRING",
-        "userscore:STRING",
-        "date:STRING",
-        "company:STRING"
-    ]
-)
-
 
 def run(input_file: str,
         analytics_bucket: str,
@@ -54,14 +43,24 @@ def run(input_file: str,
 
         pc_base = to_pcollection(base.astype(str), yield_elements='schemas')
         (pc_base | 'String to BigQuery Row' >> beam.Map(
-            lambda string_input: {"console": string_input[0],
-                                  "metascore": int(string_input[1]),
-                                  "name": string_input[2],
-                                  "userscore": string_input[3],
-                                  "date": string_input[4],
-                                  "company": string_input[5]})
+            lambda string_input: {
+                "company": string_input[5],
+                "consoles": [
+                    {
+                        "console_name": string_input[0],
+                        "scores": [
+                            {
+                                "name": string_input[2],
+                                "date": string_input[4],
+                                "userscore": string_input[3],
+                                "metascore": int(string_input[1])
+                            }
+                        ]
+                    }
+                ]
+            })
          | "Write to BQ" >> WriteToBigQuery(table=f"{target_project_id}:{staging_dataset}.metacritic_model",
-                                            schema=METACRITIC_SCHEMA,
+                                            schema="SCHEMA_AUTODETECT",
                                             write_disposition=beam.io.BigQueryDisposition.WRITE_TRUNCATE,
                                             create_disposition=beam.io.BigQueryDisposition.CREATE_IF_NEEDED,
                                             method="FILE_LOAD"))

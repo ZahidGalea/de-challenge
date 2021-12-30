@@ -9,7 +9,19 @@ from tests.python.utils import resources_handler
 
 @scenario('datapipeline/pipeline_framework.feature',
           'El archivo result.csv llega al bucket landing y se ejecuta la ETL')
-def test_workflow_trigger(context):
+def test_result_csv(context):
+    pass
+
+
+@scenario('datapipeline/pipeline_framework.feature',
+          'El archivo consoles.csv llega al bucket landing y se ejecuta la ETL')
+def test_consoles_csv(context):
+    pass
+
+
+@scenario('datapipeline/pipeline_framework.feature',
+          'El archivo sindefinicion.csv llega al bucket landing y se ejecuta la ETL')
+def test_sin_definicion(context):
     pass
 
 
