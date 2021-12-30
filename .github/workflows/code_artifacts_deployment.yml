@@ -20,7 +20,7 @@ env:
 jobs:
   workflows-deployment:
     runs-on: ubuntu-latest
-    environment: test
+    environment: prod
     steps:
       - uses: actions/checkout@v2
       - id: 'auth'
@@ -41,7 +41,7 @@ jobs:
 
   workflows-trigger-gcf-deployment:
     runs-on: ubuntu-latest
-    environment: test
+    environment: prod
     steps:
       - uses: actions/checkout@v2
       - id: 'auth'
@@ -69,7 +69,7 @@ jobs:
 
   dataflow-flex-tmpl-deployment:
     runs-on: ubuntu-latest
-    environment: test
+    environment: prod
     steps:
       - uses: actions/checkout@v2
       - id: 'auth'
@@ -101,7 +101,7 @@ jobs:
   integration-test:
     needs: [ workflows-deployment, workflows-trigger-gcf-deployment, dataflow-flex-tmpl-deployment ]
     runs-on: ubuntu-latest
-    environment: test
+    environment: prod
     steps:
       - uses: actions/checkout@v2
       - id: 'auth'

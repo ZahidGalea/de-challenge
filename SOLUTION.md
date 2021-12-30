@@ -68,6 +68,12 @@ https://lucid.app/lucidchart/3bdfd770-c1cc-4921-8986-bd8602bc7404/edit?invitatio
 
 ## Resume & Workflow
 
+In this challengue I have developed a little framework, that handles the file arrive into a landing GCP Bucket, consolidates it into a Raw bucket.
+afther these previous steps, if a dataflow job declaration exists, it gets executed using the previos raw file. In this case as example, 
+As resume we have the following diagram:
+
+
+
 ## Steps to reproduce
 
 
