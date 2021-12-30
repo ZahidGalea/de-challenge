@@ -65,7 +65,7 @@ jobs:
             --clear-max-instances \
             --region us-central1 \
             --memory 128MB \
-            --set-env-vars ENVIRONMENT=TEST
+            --set-env-vars ENVIRONMENT=PROD
 
   dataflow-flex-tmpl-deployment:
     runs-on: ubuntu-latest
